@@ -22,3 +22,6 @@ for (let i = 0; i < livros.length; i++) {
 
 const livro_mais_novo = livros.find((livro) => livro.ano > 2000);
 console.log(livro_mais_novo.titulo);
+
+const posicao_livro_mais_novo = livros.findIndex((livro) => livro.ano > 2000);
+console.log(posicao_livro_mais_novo);
