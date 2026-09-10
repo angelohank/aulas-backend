@@ -10,3 +10,7 @@ app.get('/livros', (req, res) => {
 });
 
 app.listen(3001);
+
+let pi = parseFloat("3.14");
+console.log(typeof pi);
+console.log(pi);
