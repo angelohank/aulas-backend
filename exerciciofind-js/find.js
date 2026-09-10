@@ -23,7 +23,16 @@ const filmes = [
 
 
 
+const posicaoDoFilme = filmes.findIndex(filme => filme.Ano > 2000);
+console.log(posicaoDoFilme);
+
 
 
 const depoisDeDoisMil = filmes.find(filmes => filmes.Ano > 2000);
 console.log(depoisDeDoisMil);
+
+const sliceFilmes = filmes.slice(0, 3);
+console.log(sliceFilmes);
+
+const spliceFilmes = filmes.splice(0, 3);
+console.log(spliceFilmes);
