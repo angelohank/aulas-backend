@@ -9,18 +9,31 @@ const app = express(); //primeiro pilar: instancia do express
  * fgDisponivel -> boolean
  */
 
-let livros = []; //banco de dados
+let livros = [
+  {
+    idLivro: 1,
+    dsTitulo: "as cronicas de narnia",
+    dsAutor: "C S Lewis",
+    fgDisponivel: true,
+  },
+]; //banco de dados
 
-//rota:
-//metodo + caminho + funcao
 app.get("/", function (req, res) {
-  //rota raiz
   res.send("seja bem vindo à gestao de livros");
 });
 
-app.get("/livros", function (pergunta, resposta) {
-  //segundo pilar: rotas
-  resposta.send("hello world");
+app.get("/livros", function (req, res) {
+  res.json(livros);
+});
+
+app.get("/livros/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+
+  if (isNaN(id)) {
+    return res
+      .status(400)
+      .json({ mensagem: "o parametro precisa ser um numero valido" });
+  }
 });
 
 app.listen(3000); //terceiro pilar: porta a ser ouvida
