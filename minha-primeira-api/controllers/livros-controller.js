@@ -1,3 +1,5 @@
+import { prisma } from "../client.js";
+
 let livros = [
   {
     idLivro: 1,
@@ -9,36 +11,35 @@ let livros = [
 
 let ultimoId = 1;
 
-export function findAll() {
-  return livros;
+export async function findAll() {
+  const livrosEncontrados = await prisma.livros.findMany();
+  return livrosEncontrados;
 }
-export function findOne(id) {
-  let livro = livros.find((livro) => {
-    return livro.idLivro === id;
+export async function findOne(idLivro) {
+  const livro = await prisma.livros.findUnique({
+    where: {
+      id: idLivro,
+    },
   });
 
   return livro;
 }
-export function criarLivro(titulo, autor) {
-  let novoId = ultimoId + 1;
-  ultimoId++;
-
-  let novo_livro = {
-    idLivro: novoId,
-    fgDisponivel: true,
-    dsTitulo: titulo,
-    dsAutor: autor,
-  };
-
-  livros.push(novo_livro);
-  return novo_livro;
-}
-
-export function deletarLivro(id) {
-  let index_livro = livros.findIndex((livro) => {
-    return livro.idLivro === id;
+export async function criarLivro(titulo, autor) {
+  const livroCriado = await prisma.livros.create({
+    data: {
+      dsTitulo: titulo,
+      dsAutor: autor,
+    },
   });
 
-  livros.splice(index_livro, 1);
+  return livroCriado;
+}
+
+export async function deletarLivro(idLivro) {
+  const livroDeltado = await prisma.livros.delete({
+    where: {
+      id: idLivro,
+    },
+  });
 }
 function editarLivro() {}

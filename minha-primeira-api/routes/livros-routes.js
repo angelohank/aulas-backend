@@ -5,14 +5,16 @@ import {
   findAll,
   findOne,
 } from "../controllers/livros-controller.js";
-
+import { verificaAdmin } from "../controllers/usuarios-controller.js";
 const router = Router();
 
-router.get("/", (req, res) => {
-  const todosOsLivros = findAll();
+router.get("/", async (req, res) => {
+  const todosOsLivros = await findAll();
+
+  console.log(todosOsLivros);
   res.json(todosOsLivros);
 });
-router.get("/:id", (req, res) => {
+router.get("/:id", async (req, res) => {
   const idLivro = parseInt(req.params.id);
 
   if (isNaN(idLivro)) {
@@ -21,7 +23,7 @@ router.get("/:id", (req, res) => {
       .json({ mensagem: "identificador deve ser um numero" });
   }
 
-  let livro = findOne(idLivro);
+  let livro = await findOne(idLivro);
 
   if (!livro) {
     return res.status(404).send();
@@ -30,7 +32,7 @@ router.get("/:id", (req, res) => {
   res.json(livro);
 });
 
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
   let autor_enviado = req.body.dsAutor;
   let titulo_enviado = req.body.dsTitulo;
 
@@ -39,8 +41,23 @@ router.post("/", (req, res) => {
       .status(400)
       .json({ mensagem: "dados faltando, verifique autor e titulo" });
   }
+  //antes de criar, temos que verificar, se o usuario que fez a chamada, eh admin
 
-  let livro_criado = criarLivro(titulo_enviado, autor_enviado);
+  // let auth = req.headers.authorization; //Basic Y2FybG9z
+
+  // if (!auth) {
+  //   return res.status(401).send();
+  // }
+
+  // //split
+  // let username = auth.split(" ")[1]; //aqui eu tenho o nome de usuario
+
+  // let ehAdmin = verificaAdmin(username);
+  // if (!ehAdmin) {
+  //   return res.status(403).send();
+  // }
+
+  let livro_criado = await criarLivro(titulo_enviado, autor_enviado);
   if (!livro_criado) {
     return res.status(500).json({ mensagem: "algo deu errado" });
   }
@@ -48,7 +65,7 @@ router.post("/", (req, res) => {
   return res.status(201).json(livro_criado);
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", async (req, res) => {
   const idLivro = parseInt(req.params.id);
 
   if (isNaN(idLivro)) {
@@ -57,12 +74,12 @@ router.delete("/:id", (req, res) => {
       .json({ mensagem: "identificador deve ser um numero" });
   }
 
-  let livro = findOne(idLivro);
+  let livro = await findOne(idLivro);
   if (!livro) {
     return res.status(404).send();
   }
 
-  deletarLivro(idLivro);
+  await deletarLivro(idLivro);
   return res.status(204).send();
 });
 router.patch("/:id", (req, res) => {});
