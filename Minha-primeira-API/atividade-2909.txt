@@ -1,0 +1,171 @@
+function validarParametros(parametros_a_validar) {
+    const numero = parseInt(parametros_a_validar);
+    if (isNaN(numero)) {
+        return false;
+    }
+    return true;
+}
+
+
+
+
+
+app.use(express.json()); // Middleware para habilitar o parsing de JSON
+let ultimo_Id = 1;
+
+let livros = [
+    {
+        idLivro: 1,
+        dsTitulo: "O Senhor dos Anéis",
+        dsAutor: "J.R.R. Tolkien",
+        fgDisponivel: true
+    }
+];
+
+app.get ("/", (req, res) => { // Rota raiz
+    res.send("Seja bem vindo a gestão de livros");
+    });
+
+app.get ("/livros", (req, res) => { // Rota livros
+    res.json(livros);
+
+});
+
+app.get ("/livros/:id", (req, res) => { // Rota livros com id
+
+
+    if (!validarParametros(req.params.id)) {
+        return res.status(400).json({mensagem: "ID inválido"});
+    }
+
+    let livro = livros.find((livro) => {
+    return livro.idLivro === id;
+    });
+
+    if (!livro) {
+        return res.status(404).send();
+     }
+
+    res.json(livro);
+    });
+
+app.post("/livros", (req, res) => {
+
+    let autor_enviado = req.body.dsAutor;
+    let titulo_enviado = req.body.dsTitulo;
+
+    if (!autor_enviado || !titulo_enviado) {
+        res.status(400).json({
+            mensagem: "Autor e título são obrigatórios"
+        });
+        return;
+    }
+
+    let id_novo = ultimo_Id + 1;
+    ultimo_Id++;
+
+    let novo_livro = {
+        idLivro: id_novo,
+        dsTitulo: titulo_enviado,
+        dsAutor: autor_enviado,
+        fgDisponivel: true
+    };
+
+    livros.push(novo_livro);
+
+    res.status(201).json(novo_livro);
+});
+
+app.post("/livros/:id/emprestimo", (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+        res.status(400).json({mensagem: 'ID inválido'});
+        return;
+    }
+
+    const livro = livros.find(livro => livro.idLivro === id);
+
+    if (!livro) {
+        res.status(404).send();
+        return;
+    }
+
+    if (!livro.fgDisponivel) {
+        res.status(400).json({mensagem: 'Livro não disponível para empréstimo'});
+        return;
+    }
+
+    livro.fgDisponivel = false;
+    res.json(livro);
+});
+
+app.post("/livros/:id/devolucao", (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+        res.status(400).json({mensagem: 'ID inválido'});
+        return;
+    }
+    const livro = livros.find(livro => livro.idLivro === id);
+
+    if (!livro) {
+        res.status(404).send();
+        return;
+    }
+
+    if (livro.fgDisponivel) {
+        res.status(400).json({mensagem: 'Livro já está disponível'});
+        return;
+    }
+    livro.fgDisponivel = true;
+    res.json(livro);
+});
+
+
+app.delete("/livros/:id", (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+        res.status(400).json({mensagem: 'ID inválido'});
+        return;
+    }
+
+    let index_livro = livros.findIndex(livro => livro.idLivro === id);
+
+    if (index_livro === -1) {
+        res.status(404).send();
+        return;
+    }
+
+    livros.splice(index_livro, 1);
+    res.status(204).send();
+
+});
+
+app.patch("/livros/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const novo_titulo = req.body.dsTitulo;
+  const novo_autor = req.body.dsAutor;
+
+  if (isNaN(id)) {
+    return res
+      .status(400)
+      .json({ mensagem: "identificador precisa ser um numero valido" });
+  }
+
+  let index_livro = livros.findIndex((livro) => {
+    return livro.idLivro === id;
+  });
+
+  if (index_livro === -1) {
+    return res.sendStatus(404);
+  }
+
+  let livro_a_ser_atualizado = livros[index_livro];
+
+  if (novo_autor !== undefined) {
+    livro_a_ser_atualizado.dsAutor = novo_autor;
+  }
+
+  if (novo_titulo !== undefined) {
+    livro_a_ser_atualizado.dsTitulo = novo_titulo;
+  }
+});
