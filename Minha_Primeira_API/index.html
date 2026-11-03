@@ -1,0 +1,22 @@
+@baseUrl = http://localhost:3005
+@contentType = application/json
+
+### Listar todos os livros
+GET {{baseUrl}}/livros
+Accept: {{contentType}}
+
+### Buscar livro por ID
+@id = 1
+GET {{baseUrl}}/livros/{{id}}
+Accept: {{contentType}}
+
+### Criar um novo livro
+POST {{baseUrl}}/livros
+Content-Type: {{contentType}}
+
+{
+  "titulo": "Dom Casmurro",
+  "autor": "Machado de Assis",
+  "ano": 1899,
+  "editora": "Garnier"
+}
